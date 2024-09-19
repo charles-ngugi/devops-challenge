@@ -8,6 +8,9 @@ import (
 	"math/rand/v2"
 	"net/http"
 	"net/url"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Bird struct {
@@ -24,13 +27,25 @@ func defaultBird(err error) Bird {
 	}
 }
 
+func loadEnv() {
+	if err := godotenv.Load(); err != nil {
+		fmt.Printf("Error loading .env file: %s\n", err)
+	}
+}
+
 func getBirdImage(birdName string) (string, error) {
-    res, err := http.Get(fmt.Sprintf("http://localhost:4200?birdName=%s", url.QueryEscape(birdName)))
-    if err != nil {
-        return "", err
-    }
-    body, err := io.ReadAll(res.Body)
-    return string(body), err
+	loadEnv()
+	birdImageAPIURL := os.Getenv("BIRD_IMAGE_API_URL")
+	if birdImageAPIURL == "" {
+		return "", fmt.Errorf("BIRD_IMAGE_API_URL not set in .env file")
+	}
+
+	res, err := http.Get(fmt.Sprintf("%s?birdName=%s", birdImageAPIURL, url.QueryEscape(birdName)))
+	if err != nil {
+		return "", err
+	}
+	body, err := io.ReadAll(res.Body)
+	return string(body), err
 }
 
 func getBirdFactoid() Bird {
@@ -50,12 +65,12 @@ func getBirdFactoid() Bird {
 		fmt.Printf("Error unmarshalling bird: %s", err)
 		return defaultBird(err)
 	}
-    birdImage, err := getBirdImage(bird.Name)
-    if err != nil {
-        fmt.Printf("Error in getting bird image: %s\n", err)
-        return defaultBird(err)
-    }
-    bird.Image = birdImage
+	birdImage, err := getBirdImage(bird.Name)
+	if err != nil {
+		fmt.Printf("Error in getting bird image: %s\n", err)
+		return defaultBird(err)
+	}
+	bird.Image = birdImage
 	return bird
 }
 
