@@ -1,3 +1,7 @@
 bird/getBird
 birdImage/getBirdImage
 .env
+*.tfstate
+*.tfstate.backup
+.terraform/
+*.tfvars
