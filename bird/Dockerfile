@@ -11,7 +11,6 @@ COPY . .
 
 EXPOSE 4201
 
-CMD ["sh", "-c", "go run main.go > /app/app.log 2>&1 &"]
-
+CMD ["go", "run", "main.go"]
 
 
