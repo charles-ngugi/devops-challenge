@@ -117,6 +117,46 @@ resource "aws_instance" "birdapi_server" {
     encrypted   = true
   }
 
+  # Install required dependencies
+  user_data = <<-EOF
+    #!/bin/bash
+
+    # Update the system and install required packages
+    echo "Updating system..." 
+    sudo apt-get update -y 
+    sudo apt-get dist-upgrade -y 
+
+    # Install Docker and MicroK8s
+    echo "Installing Docker..." 
+    sudo apt-get install -y docker.io
+    sudo usermod -aG docker ubuntu
+
+    # Install MicroK8s
+    sudo snap install microk8s --classic
+    sudo usermod -aG microk8s ubuntu
+    sudo mkdir -p /home/ubuntu/.kube
+    sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube
+    microk8s status --wait-ready 
+    microk8s enable dns ingress storage 
+
+    # Install Helm
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash 
+
+    microk8s kubectl create namespace monitoring
+
+    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo add grafana https://grafana.github.io/helm-charts
+    helm repo update
+
+
+    helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true --namespace ingress-nginx
+    helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
+    helm install grafana grafana/grafana --namespace monitoring
+
+  EOF
+
+
   disable_api_termination = true
 
   metadata_options {
