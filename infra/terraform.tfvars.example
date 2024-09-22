@@ -1,0 +1,9 @@
+aws_access_key = ""
+aws_secret_key = ""
+aws_region     = "region to deploy EC2"
+ami            = "ami ID for instance type to be used"
+instance_type  = "instance type eg t3.medium"
+disk_size      = 20
+instance_name  = "name of EC2 instance"
+key_name       = "name of key pair"
+my_ip          = "your public IP" 
