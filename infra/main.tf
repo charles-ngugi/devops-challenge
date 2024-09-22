@@ -142,17 +142,30 @@ resource "aws_instance" "birdapi_server" {
     # Install Helm
     curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash 
 
+    #create namespaces
+    microk8s kubectl create namespace bird-api
+
     microk8s kubectl create namespace monitoring
 
-    helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+    #helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm repo add grafana https://grafana.github.io/helm-charts
     helm repo update
 
 
-    helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true --namespace ingress-nginx
-    helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring
-    helm install grafana grafana/grafana --namespace monitoring
+    #helm install nginx-ingress ingress-nginx/ingress-nginx --set controller.publishService.enabled=true --namespace ingress-nginx
+    
+    #allow kubeclt and helm use microk8s config
+
+    microk8s config > ~/.kube/config
+    kubectl config use-context microk8s
+    
+    #helm install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --set prometheus.service.name=prometheus
+    #helm install grafana grafana/grafana --namespace monitoring --set service.name=grafana
+    microk8s helm3 install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --set prometheus.service.name=prometheus
+    microk8s helm3 install grafana grafana/grafana --namespace monitoring --set service.name=grafana
+
+
 
   EOF
 
