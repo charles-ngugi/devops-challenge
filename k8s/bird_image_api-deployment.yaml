@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bird-image-api
+  namespace: bird-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bird-image-api
+  template:
+    metadata:
+      labels:
+        app: bird-image-api
+    spec:
+      containers:
+      - name: bird-image-api
+        image: charlesngugi023/birdimageapi:latest
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 4200
