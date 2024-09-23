@@ -27,7 +27,8 @@ The two images used are public.
 ### Docker
 
 `docker pull charlesngugi023/birdimageapi:latest & docker pull charlesngugi023/birdapi:latest`
-create a network to be used by the two containers. eg `docker create network bird`
+create a network to be used by the two containers
+`docker create network bird`
 
 #### In the bird directory
 `docker run -d --network bird -p 4201:4201 -it --name bird_api charlesngugi023/birdapi`
@@ -47,5 +48,9 @@ To run the app:
 - `kubectl apply -f k8s/` while in the root directory
 - `microk8s helm3 install prometheus prometheus-community/kube-prometheus-stack --namespace monitoring --set prometheus.service.name=prometheus`
 - `microk8s helm3 install grafana grafana/grafana --namespace monitoring --set service.name=grafana`
-- `kubectl get all -n bird-api` to see deployments, services, replicasets, pods and HPAs.
--  `kubectl get ingress -n bird-api` to see the ingress used to serve the app
+- `kubectl get all -n bird-api` to see deployments, services, replicasets, pods and HPAs
+- `kubectl get ingress -n bird-api` to see the ingress used to serve the app
+- `kubectl get all -n monitoting` to view Prometheus and Grafana
+
+To access the bird-api enter the host used in the ingress eg http://bird-api.local
+To access the bird-api enter the host used in the ingress eg http://bird-api.local/image
